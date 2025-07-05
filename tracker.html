@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiritual Activities Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .auth-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #718096;
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section, .stats-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section h2, .stats-section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .activity-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .input-row label {
+            min-width: 200px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .stats-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats-content {
+            display: none;
+        }
+
+        .stats-content.active {
+            display: block;
+        }
+
+        .week-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .week-nav {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-card h3 {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card .percentage {
+            font-size: 1.2rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .weekly-history {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .week-entry {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+        }
+
+        .week-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .week-title {
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .admin-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-data {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e53e3e;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .input-row label {
+                min-width: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Spiritual Activities Tracker</h1>
+            <p>Track your weekly spiritual activities and view progress over time</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="auth-section" id="authSection">
+            <div class="auth-form">
+                <h2 style="text-align: center; margin-bottom: 20px;">Login</h2>
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button class="btn" onclick="login()">Login</button>
+                <button class="btn btn-secondary" onclick="showRegister()">Register</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <button class="btn logout-btn" onclick="logout()">Logout</button>
+            
+            <div class="dashboard">
+                <!-- Form Section -->
+                <div class="form-section">
+                    <h2>Weekly Activities Entry</h2>
+                    <div class="activity-form">
+                        <div class="input-row">
+                            <label for="approaches">Number of Approaches:</label>
+                            <input type="number" id="approaches" min="0" value="0">
+                        </div>
+                        <div class="input-row">
+                            <label for="conversations">Spiritual Conversations:</label>
+                            <input type="number" id="conversations" min="0" value="0">
+                        </div>
+                        <div class="input-row">
+                            <label for="sharings">Gospel Sharings:</label>
+                            <input type="number" id="sharings" min="0" value="0">
+                        </div>
+                        <div class="input-row">
+                            <label for="saved">Number Saved:</label>
+                            <input type="number" id="saved" min="0" value="0">
+                        </div>
+                        <button class="btn" onclick="submitWeeklyData()">Submit This Week's Data</button>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <h2>Statistics</h2>
+                    <div class="stats-tabs">
+                        <button class="tab-btn active" onclick="showTab('weekly')">Weekly</button>
+                        <button class="tab-btn" onclick="showTab('monthly')">Monthly</button>
+                        <button class="tab-btn" onclick="showTab('annual')">Annual</button>
+                    </div>
+
+                    <!-- Weekly Stats -->
+                    <div class="stats-content active" id="weeklyStats">
+                        <div class="week-selector">
+                            <button class="week-nav" onclick="changeWeek(-1)">← Previous</button>
+                            <span id="currentWeekDisplay">Current Week</span>
+                            <button class="week-nav" onclick="changeWeek(1)">Next →</button>
+                        </div>
+                        <div class="stats-grid" id="weeklyStatsGrid">
+                            <!-- Weekly stats will be populated here -->
+                        </div>
+                        <div class="weekly-history" id="weeklyHistory">
+                            <!-- Weekly history will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Monthly Stats -->
+                    <div class="stats-content" id="monthlyStats">
+                        <div class="stats-grid" id="monthlyStatsGrid">
+                            <!-- Monthly stats will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Annual Stats -->
+                    <div class="stats-content" id="annualStats">
+                        <div class="stats-grid" id="annualStatsGrid">
+                            <!-- Annual stats will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Section (only visible to admin) -->
+            <div class="admin-section" id="adminSection" style="display: none;">
+                <h2>Admin Panel - All User Data</h2>
+                <div id="allUserData">
+                    <!-- All user data will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = null;
+        let currentWeekOffset = 0;
+        let userData = JSON.parse(localStorage.getItem('spiritualTrackerData') || '{}');
+        let users = JSON.parse(localStorage.getItem('spiritualTrackerUsers') || '{"admin": {"password": "admin123", "isAdmin": true}}');
+
+        // Authentication Functions
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainContent').classList.add('active');
+                
+                if (users[username].isAdmin) {
+                    document.getElementById('adminSection').style.display = 'block';
+                    loadAllUserData();
+                }
+                
+                loadUserStats();
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        function showRegister() {
+            const username = prompt('Enter desired username:');
+            const password = prompt('Enter password:');
+            
+            if (username && password) {
+                if (users[username]) {
+                    alert('Username already exists');
+                } else {
+                    users[username] = { password: password, isAdmin: false };
+                    localStorage.setItem('spiritualTrackerUsers', JSON.stringify(users));
+                    alert('Registration successful! You can now login.');
+                }
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('mainContent').classList.remove('active');
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Data Management Functions
+        function submitWeeklyData() {
+            const approaches = parseInt(document.getElementById('approaches').value) || 0;
+            const conversations = parseInt(document.getElementById('conversations').value) || 0;
+            const sharings = parseInt(document.getElementById('sharings').value) || 0;
+            const saved = parseInt(document.getElementById('saved').value) || 0;
+            
+            const weekKey = getWeekKey(0);
+            
+            if (!userData[currentUser]) {
+                userData[currentUser] = {};
+            }
+            
+            userData[currentUser][weekKey] = {
+                approaches,
+                conversations,
+                sharings,
+                saved,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('spiritualTrackerData', JSON.stringify(userData));
+            
+            // Reset form
+            document.getElementById('approaches').value = '0';
+            document.getElementById('conversations').value = '0';
+            document.getElementById('sharings').value = '0';
+            document.getElementById('saved').value = '0';
+            
+            alert('Data submitted successfully!');
+            loadUserStats();
+        }
+
+        function getWeekKey(offset) {
+            const now = new Date();
+            const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + (offset * 7));
+            return `${weekStart.getFullYear()}-W${getWeekNumber(weekStart)}`;
+        }
+
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+        }
+
+        function formatWeekDisplay(offset) {
+            const now = new Date();
+            const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + (offset * 7));
+            const weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
+            
+            const options = { month: 'short', day: 'numeric' };
+            return `${weekStart.toLocaleDateString('en-US', options)} - ${weekEnd.toLocaleDateString('en-US', options)}`;
+        }
+
+        // Statistics Functions
+        function loadUserStats() {
+            loadWeeklyStats();
+            loadMonthlyStats();
+            loadAnnualStats();
+        }
+
+        function loadWeeklyStats() {
+            const weekKey = getWeekKey(currentWeekOffset);
+            const weekData = userData[currentUser] && userData[currentUser][weekKey];
+            
+            document.getElementById('currentWeekDisplay').textContent = formatWeekDisplay(currentWeekOffset);
+            
+            const statsGrid = document.getElementById('weeklyStatsGrid');
+            if (weekData) {
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <h3>Approaches</h3>
+                        <div class="value">${weekData.approaches}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Conversations</h3>
+                        <div class="value">${weekData.conversations}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Gospel Sharings</h3>
+                        <div class="value">${weekData.sharings}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Saved</h3>
+                        <div class="value">${weekData.saved}</div>
+                    </div>
+                `;
+            } else {
+                statsGrid.innerHTML = '<p>No data for this week</p>';
+            }
+            
+            loadWeeklyHistory();
+        }
+
+        function loadWeeklyHistory() {
+            const historyDiv = document.getElementById('weeklyHistory');
+            let historyHTML = '<h3>Weekly History</h3>';
+            
+            if (userData[currentUser]) {
+                const weeks = Object.keys(userData[currentUser]).sort().reverse();
+                weeks.forEach(weekKey => {
+                    const data = userData[currentUser][weekKey];
+                    const total = data.approaches + data.conversations + data.sharings + data.saved;
+                    historyHTML += `
+                        <div class="week-entry">
+                            <div class="week-title">${weekKey}</div>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <h3>Approaches</h3>
+                                    <div class="value">${data.approaches}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <h3>Conversations</h3>
+                                    <div class="value">${data.conversations}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <h3>Sharings</h3>
+                                    <div class="value">${data.sharings}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <h3>Saved</h3>
+                                    <div class="value">${data.saved}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            historyDiv.innerHTML = historyHTML;
+        }
+
+        function loadMonthlyStats() {
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            
+            let monthlyData = { approaches: 0, conversations: 0, sharings: 0, saved: 0 };
+            
+            if (userData[currentUser]) {
+                Object.keys(userData[currentUser]).forEach(weekKey => {
+                    if (weekKey.startsWith(now.getFullYear().toString())) {
+                        const data = userData[currentUser][weekKey];
+                        monthlyData.approaches += data.approaches;
+                        monthlyData.conversations += data.conversations;
+                        monthlyData.sharings += data.sharings;
+                        monthlyData.saved += data.saved;
+                    }
+                });
+            }
+            
+            const total = monthlyData.approaches + monthlyData.conversations + monthlyData.sharings + monthlyData.saved;
+            const statsGrid = document.getElementById('monthlyStatsGrid');
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Activities</h3>
+                    <div class="value">${total}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Approaches</h3>
+                    <div class="value">${monthlyData.approaches}</div>
+                    <div class="percentage">${total > 0 ? ((monthlyData.approaches / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Conversations</h3>
+                    <div class="value">${monthlyData.conversations}</div>
+                    <div class="percentage">${total > 0 ? ((monthlyData.conversations / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Gospel Sharings</h3>
+                    <div class="value">${monthlyData.sharings}</div>
+                    <div class="percentage">${total > 0 ? ((monthlyData.sharings / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Saved</h3>
+                    <div class="value">${monthlyData.saved}</div>
+                    <div class="percentage">${total > 0 ? ((monthlyData.saved / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+            `;
+        }
+
+        function loadAnnualStats() {
+            const now = new Date();
+            const currentYear = now.getFullYear().toString();
+            
+            let annualData = { approaches: 0, conversations: 0, sharings: 0, saved: 0 };
+            
+            if (userData[currentUser]) {
+                Object.keys(userData[currentUser]).forEach(weekKey => {
+                    if (weekKey.startsWith(currentYear)) {
+                        const data = userData[currentUser][weekKey];
+                        annualData.approaches += data.approaches;
+                        annualData.conversations += data.conversations;
+                        annualData.sharings += data.sharings;
+                        annualData.saved += data.saved;
+                    }
+                });
+            }
+            
+            const total = annualData.approaches + annualData.conversations + annualData.sharings + annualData.saved;
+            const statsGrid = document.getElementById('annualStatsGrid');
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Activities (${currentYear})</h3>
+                    <div class="value">${total}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Approaches</h3>
+                    <div class="value">${annualData.approaches}</div>
+                    <div class="percentage">${total > 0 ? ((annualData.approaches / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Conversations</h3>
+                    <div class="value">${annualData.conversations}</div>
+                    <div class="percentage">${total > 0 ? ((annualData.conversations / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Gospel Sharings</h3>
+                    <div class="value">${annualData.sharings}</div>
+                    <div class="percentage">${total > 0 ? ((annualData.sharings / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Saved</h3>
+                    <div class="value">${annualData.saved}</div>
+                    <div class="percentage">${total > 0 ? ((annualData.saved / total) * 100).toFixed(1) : 0}%</div>
+                </div>
+            `;
+        }
+
+        // Admin Functions
+        function loadAllUserData() {
+            const adminDiv = document.getElementById('allUserData');
+            let adminHTML = '';
+            
+            Object.keys(userData).forEach(username => {
+                if (username !== 'admin') {
+                    adminHTML += `<div class="user-data">
+                        <h3>User: ${username}</h3>`;
+                    
+                    Object.keys(userData[username]).forEach(weekKey => {
+                        const data = userData[username][weekKey];
+                        adminHTML += `
+                            <div class="week-entry">
+                                <div class="week-title">${weekKey}</div>
+                                <p>Approaches: ${data.approaches}, Conversations: ${data.conversations}, Sharings: ${data.sharings}, Saved: ${data.saved}</p>
+                            </div>
+                        `;
+                    });
+                    
+                    adminHTML += '</div>';
+                }
+            });
+            
+            adminDiv.innerHTML = adminHTML || '<p>No user data available</p>';
+        }
+
+        // UI Functions
+        function showTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.stats-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Stats').classList.add('active');
+        }
+
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            loadWeeklyStats();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-login admin for demo (remove in production)
+            // document.getElementById('username').value = 'admin';
+            // document.getElementById('password').value = 'admin123';
+        });
+    </script>
+</body>
+</html>
